@@ -1,6 +1,6 @@
 import { Box, Flex, Text, Button, Stack, HStack, Image } from "@chakra-ui/react";
 import { NavLink } from "react-router-dom";
-
+//prueba de git
 export default function Navbar() {
   return (
     <Box>
