@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Card, CardBody, Text } from '@chakra-ui/react';
+import Cards from '../ui-elements/card';
 
 function Products() {
   const url = 'http://localhost:3000/data';
@@ -26,22 +27,13 @@ function Products() {
   }, []);
 
   return (
-    <Box>
+    <Box p={4}>
       {error ? (
         <Text color="red.500">Error: {error}</Text>
       ) : !todos.length ? (
-        'Cargando . . .'
+        <Text>Cargando . . .</Text>
       ) : (
-        todos.map((todo, index) => (
-          <Card key={index} mb={4}>
-            <CardBody>
-              <Text>ID: {todo.id}</Text>
-              <Text>Nombre: {todo.nombre}</Text>
-              <Text>Descripcion: {todo.descripcion}</Text>
-              <Text>Cantidad: {todo.cantidad}</Text>
-            </CardBody>
-          </Card>
-        ))
+        <Cards todos={todos} />
       )}
     </Box>
   );
