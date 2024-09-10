@@ -1,78 +1,46 @@
-import { Box, Flex, Text, Button, Stack, HStack, Image } from "@chakra-ui/react";
+import { Box, Flex, Button, IconButton } from "@chakra-ui/react";
 import { NavLink } from "react-router-dom";
-//prueba de git
+import { AddIcon, SearchIcon, CalendarIcon, InfoIcon } from '@chakra-ui/icons'; // Usa solo íconos de Chakra
+
 export default function Navbar() {
   return (
     <Box>
       <Flex bg={"blue.900"} color={"white"} py={2} px={4} align={"center"}>
-        <Flex flex={1} justify={"start"}>
-          {/* Para colocar un logo*/}
-          
-          {/* Para los NavLinks*/}
-          <Flex display={"flex"} ml={10}>
-            <DesktopNav />
-          </Flex>
-        </Flex>
+        <Button as={NavLink} to={"/signin"} color="red.500" fontWeight={400} variant={"link"}>
+          cerrar sesión
+        </Button>
 
-        <HStack justify={"flex-end"} spacing={6}>
-          <Button
-            as={NavLink}
-            to={"/signin"}
-            fontSize={"sm"}
-            color={"white"}
-            fontWeight={400}
-            variant={"link"}
-          >
-            Sign In
-          </Button>
-        </HStack>
+        <Flex ml="auto"> 
+          <IconButton 
+            as={NavLink} 
+            to={"/productos"} 
+            aria-label="Agregar" 
+            icon={<AddIcon />} 
+            variant={"ghost"} 
+          />
+          <IconButton 
+            as={NavLink} 
+             
+            aria-label="Carrito de compras" 
+            icon={<CalendarIcon />}  // Usando CalendarIcon temporalmente
+            variant={"ghost"} 
+          />
+          <IconButton 
+            as={NavLink} 
+            
+            aria-label="Buscar" 
+            icon={<SearchIcon />} 
+            variant={"ghost"} 
+          />
+          <IconButton 
+            as={NavLink} 
+            to={"/graficas"} 
+            aria-label="Gráfica" 
+            icon={<InfoIcon />} 
+            variant={"ghost"} 
+          />
+        </Flex>
       </Flex>
     </Box>
   );
 }
-
-const DesktopNav = () => {
-  return (
-    <Stack direction={"row"} spacing={4}>
-      {NAV_ITEMS.map((navItem) => (
-        <Box key={navItem.label}>
-          <NavLink
-            to={navItem.href ?? "#"}
-            style={({ isActive }) =>
-              isActive
-                ? {
-                    padding: "8px",
-                    fontSize: "sm",
-                    fontWeight: 800,
-                    color: "white",
-                  }
-                : {
-                    padding: "8px",
-                    fontSize: "sm",
-                    fontWeight: 200,
-                    color: "white",
-                  }
-            }
-          >
-            {navItem.label}
-          </NavLink>
-        </Box>
-      ))}
-    </Stack>
-  );
-};
-
-const NAV_ITEMS = [
-  {
-    label: "Home",
-    href: "/",
-  },
-  {
-    label: "Productos",
-    href: "/productos",
-  },
-  {
-    label: "Grafica",
-    href: "/graficas",
-  },
-];
