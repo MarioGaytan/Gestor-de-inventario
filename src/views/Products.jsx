@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Card, CardBody, Text } from '@chakra-ui/react';
+import { Box, Text } from '@chakra-ui/react';
 import Cards from '../ui-elements/card';
 
 function Products() {
@@ -7,6 +7,7 @@ function Products() {
   const [todos, setTodos] = useState([]);
   const [error, setError] = useState(null);
 
+  // Función para obtener los productos desde la API
   const fetchApi = async () => {
     try {
       const response = await fetch(url);
@@ -22,6 +23,26 @@ function Products() {
     }
   };
 
+  // Función para eliminar un producto del estado local y API
+  const handleDeleteProduct = async (id) => {
+    try {
+      // Eliminar el producto en la API
+      const response = await fetch(`${url}/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error deleting product with ID ${id}`);
+      }
+
+      // Eliminar el producto del estado local
+      setTodos(prevTodos => prevTodos.filter(todo => todo.id !== id));
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      setError(error.message);
+    }
+  };
+
   useEffect(() => {
     fetchApi();
   }, []);
@@ -33,7 +54,7 @@ function Products() {
       ) : !todos.length ? (
         <Text>Cargando . . .</Text>
       ) : (
-        <Cards todos={todos} />
+        <Cards todos={todos} onDelete={handleDeleteProduct} />
       )}
     </Box>
   );

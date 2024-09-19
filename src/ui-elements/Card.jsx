@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardBody, Text, SimpleGrid, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Button, Input, Grid, Box } from '@chakra-ui/react';
+import {
+  Card, CardBody, Text, SimpleGrid, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody,
+  ModalCloseButton, Button, Input, Grid, Box, useToast
+} from '@chakra-ui/react';
 import { DeleteIcon } from '@chakra-ui/icons';
 
 /**
@@ -12,6 +15,9 @@ function Cards({ onDelete, onUpdate }) {
   const [isOpen, setIsOpen] = useState(false); // Estado para controlar la visibilidad del modal
   const [selectedTodo, setSelectedTodo] = useState(null); // Estado para el producto seleccionado
   const [newCantidad, setNewCantidad] = useState(''); // Estado para la nueva cantidad del producto
+  const [cantidadAgregar, setCantidadAgregar] = useState(0); // Estado para la cantidad a agregar
+  const [cantidadRetirar, setCantidadRetirar] = useState(0); // Estado para la cantidad a retirar
+  const toast = useToast(); // Hook de Chakra UI para notificaciones
 
   /**
    * useEffect para obtener los datos de la API cuando el componente se monta.
@@ -30,6 +36,8 @@ function Cards({ onDelete, onUpdate }) {
   const openModal = (todo) => {
     setSelectedTodo(todo);
     setNewCantidad(todo.cantidad);
+    setCantidadAgregar(0); // Restablecer las cantidades de agregar y retirar
+    setCantidadRetirar(0);
     setIsOpen(true);
   };
 
@@ -46,7 +54,8 @@ function Cards({ onDelete, onUpdate }) {
    * Maneja la eliminación del producto seleccionado.
    */
   const handleDelete = () => {
-    onDelete(selectedTodo.id);
+    onDelete(selectedTodo.id); // Llama a la función de eliminación
+    setTodos(todos.filter(todo => todo.id !== selectedTodo.id)); // Remueve el producto del estado local
     closeModal();
   };
 
@@ -54,7 +63,31 @@ function Cards({ onDelete, onUpdate }) {
    * Maneja la actualización de la cantidad del producto seleccionado.
    */
   const handleUpdate = () => {
-    onUpdate(selectedTodo.id, newCantidad);
+    const totalRetirar = parseFloat(cantidadRetirar);
+    const totalAgregar = parseFloat(cantidadAgregar);
+    const cantidadActual = parseFloat(newCantidad);
+
+    // Validaciones de las cantidades
+    if (totalRetirar > cantidadActual) {
+      toast({
+        title: 'Error',
+        description: 'No puedes retirar más de lo que existe',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    const cantidadFinal = cantidadActual - totalRetirar + totalAgregar;
+
+    // Actualiza el producto localmente
+    const updatedTodos = todos.map(todo =>
+      todo.id === selectedTodo.id ? { ...todo, cantidad: cantidadFinal } : todo
+    );
+
+    setTodos(updatedTodos);
+    onUpdate(selectedTodo.id, cantidadFinal); // Llama a la función onUpdate con la nueva cantidad
     closeModal();
   };
 
@@ -91,17 +124,38 @@ function Cards({ onDelete, onUpdate }) {
                     <Text fontWeight="bold">ID: {selectedTodo.id}</Text>
                     <Text>Nombre: {selectedTodo.nombre}</Text>
                     <Text>Descripción: {selectedTodo.descripcion}</Text>
-                    <Text>Cantidad: {selectedTodo.cantidad}</Text>
-                    <Grid templateColumns='repeat(2, 1fr)' gap={6}>
-                      <Text>Retirar:</Text>
-                      <Input
-                        type="number"
-                      />
-                    </Grid>
-                    <Grid templateColumns='repeat(2, 1fr)' gap={6}>
+                    <Text>Cantidad actual: {selectedTodo.cantidad}</Text>
+                    <Grid templateColumns='repeat(2, 1fr)' gap={6} mt={4}>
                       <Text>Agregar:</Text>
                       <Input
                         type="number"
+                        value={cantidadAgregar}
+                        onChange={e => {
+                          const value = parseInt(e.target.value, 10);
+                          if (!isNaN(value) && value >= 0) {
+                            setCantidadAgregar(value);
+                          }
+                        }}
+                        min="0"
+                        step="1"
+                        placeholder="Cantidad a agregar"
+                      />
+                    </Grid>
+                    <Grid templateColumns='repeat(2, 1fr)' gap={6} mt={4}>
+                      <Text>Retirar:</Text>
+                      <Input
+                        type="number"
+                        value={cantidadRetirar}
+                        onChange={e => {
+                          const value = parseInt(e.target.value, 10);
+                          if (!isNaN(value) && value >= 0) {
+                            setCantidadRetirar(value);
+                          }
+                        }}
+                        min="0"
+                        step="1"
+                        max={newCantidad}
+                        placeholder="Cantidad a retirar"
                       />
                     </Grid>
                   </>
