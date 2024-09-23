@@ -1,25 +1,25 @@
 import React, { useState } from 'react';
-import {  Box, Grid, Button, Input, FormHelperText, HStack, VStack, FormControl, FormLabel, Checkbox } from '@chakra-ui/react';
+import { Box, Grid, Button, Input, FormHelperText, HStack, VStack, FormControl, FormLabel, Checkbox } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
+import app from '../../firebase-config';
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 
 function SignIn() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');   
+  const auth = getAuth(app);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
 
-    setError(null);    
-    if (!email.trim()) {
-      setError('El correo electrónico es obligatorio.');
-    } else if (!password.trim()) {
-      setError('La contraseña es obligatoria.');
-    } else {
-      console.log('Formulario enviado:', { email, password });
-      navigate('/'); 
-    }
+  const handleLogin = () => {
+    signInWithEmailAndPassword(auth, email, password)
+      .then((credentials) => {
+        const user = credentials.user;
+        console.log("Se autenticó con el email", user.email);
+        navigate("/");
+      })
+      .catch((error) => alert(error.message));
   };
 
   return (
@@ -47,40 +47,14 @@ function SignIn() {
           />
           <card bg="#ffffff" p={5}>
             <Grid templateColumns="1fr" gap={1}>
-              <FormControl isInvalid={error}>
-                <FormLabel>Correo electrónico</FormLabel>
-                <Input
-                  rounded='none'
-                  variant='filled'
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-                {error && <FormHelperText>{error}</FormHelperText>}
-              </FormControl>
-
-              <FormControl isInvalid={error}>
-                <FormLabel>Contraseña</FormLabel>
-                <Input
-                  rounded='none'
-                  variant='filled'
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-                {error && <FormHelperText>{error}</FormHelperText>}
-              </FormControl>
+              <Input placeholder="Usuario" onChange={(e) => setEmail(e.target.value)}></Input>
+              <Input placeholder="Contraseña" onChange={(e) => setPassword(e.target.value)}></Input>
 
               <HStack w='full' justify='space-between'>
                 <Checkbox>Recordarme.</Checkbox>
               </HStack>
 
-              <Button
-                style={{ backgroundColor: "#450068", color: "#ffffff" }}
-                onClick={handleSubmit}
-                isDisabled={!email.trim() || !password.trim()}
-              >
-                Iniciar sesión
-              </Button>
+              <Button onClick={handleLogin}>Registrar</Button>
             </Grid>
           </card>
         </HStack>
