@@ -41,10 +41,9 @@ export default function Navbar() {
       <Flex bg={"blue.900"} color={"white"} py={2} px={4} align={"center"}>
         <Button onClick={handleSignOut}>Cerrar sesión</Button>
         <Flex ml="auto">
-          <IconButton as={NavLink} to={"/productos"} aria-label="Agregar" icon={<AddIcon />} variant={"ghost"} />
-          <IconButton aria-label="Carrito de compras" icon={<CalendarIcon />} variant={"ghost"} onClick={onOpen} />
-          <IconButton aria-label="Buscar" icon={<SearchIcon />} variant={"ghost"} onClick={() => setShowSearch(!showSearch)} />
-          <IconButton as={NavLink} to={"/graficas"} aria-label="Gráfica" icon={<InfoIcon />} variant={"ghost"} />
+          <IconButton as={NavLink} to={"/productos"} aria-label="Agregar" icon={<AddIcon />} variant={"ghost"} color="white" />
+          <IconButton aria-label="Buscar" icon={<SearchIcon />} variant={"ghost"} onClick={() => setShowSearch(!showSearch)} color="white" />
+          <IconButton as={NavLink} to={"/graficas"} aria-label="Gráfica" icon={<InfoIcon />} variant={"ghost"} color="white" />
         </Flex>
       </Flex>
 
@@ -59,26 +58,6 @@ export default function Navbar() {
         </Box>
       )}
 
-      <Drawer isOpen={isOpen} placement="right" onClose={onClose}>
-        <DrawerOverlay />
-        <DrawerContent>
-          <DrawerCloseButton />
-          <DrawerHeader>Carrito de Compras</DrawerHeader>
-          <DrawerBody>
-            <List>
-              {items.map((item, index) => (
-                <ListItem key={index}>{item.nombre}</ListItem>
-              ))}
-            </List>
-          </DrawerBody>
-          <DrawerFooter>
-            <Button variant="outline" mr={3} onClick={onClose}>
-              Cerrar
-            </Button>
-            <Button colorScheme="blue">Comprar</Button>
-          </DrawerFooter>
-        </DrawerContent>
-      </Drawer>
     </Box>
   );
 }
