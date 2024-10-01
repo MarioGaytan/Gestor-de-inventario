@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Grid, Button, Input, FormHelperText, HStack, VStack, FormControl, FormLabel, Checkbox, IconButton } from '@chakra-ui/react';
+import { Box, Grid, Button, Input, FormHelperText, HStack, VStack, FormControl, Checkbox, IconButton } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'; // Importa iconos para mostrar y ocultar

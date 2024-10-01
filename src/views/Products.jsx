@@ -2,50 +2,36 @@ import React, { useEffect, useState } from 'react';
 import { Box, Text } from '@chakra-ui/react';
 import Cards from '../ui-elements/card';
 
-function Products() {
-  const url = 'http://localhost:3000/data';
+const Products = () => {
   const [todos, setTodos] = useState([]);
   const [error, setError] = useState(null);
 
-  // Función para obtener los productos desde la API
-  const fetchApi = async () => {
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
     try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const responseJSON = await response.json();
-      setTodos(responseJSON);
-      console.log(responseJSON);
+      const response = await fetch('http://localhost:3000/data');
+      if (!response.ok) throw new Error(`Error ${response.status}`);
+      const data = await response.json();
+      setTodos(data);
     } catch (error) {
-      console.error('Error fetching data:', error);
       setError(error.message);
+      console.error('Error al obtener los datos:', error);
     }
   };
 
-  // Función para eliminar un producto del estado local y API
   const handleDeleteProduct = async (id) => {
     try {
-      // Eliminar el producto en la API
-      const response = await fetch(`${url}/${id}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) {
-        throw new Error(`Error deleting product with ID ${id}`);
-      }
-
-      // Eliminar el producto del estado local
-      setTodos(prevTodos => prevTodos.filter(todo => todo.id !== id));
+      const response = await fetch(`${url}/${id}`, { method: 'DELETE' });
+      if (!response.ok) throw new Error(`Error deleting product with ID ${id}`);
+      setTodos(todos.filter(todo => todo.id !== id));
     } catch (error) {
-      console.error('Error deleting product:', error);
       setError(error.message);
+      console.error('Error deleting product:', error);
     }
   };
-
-  useEffect(() => {
-    fetchApi();
-  }, []);
 
   return (
     <Box p={4}>
@@ -58,6 +44,6 @@ function Products() {
       )}
     </Box>
   );
-}
+};
 
 export default Products;

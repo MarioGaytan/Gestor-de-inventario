@@ -29,7 +29,7 @@ function Cards({ onDelete, onUpdate }) {
       .catch(error => console.error('Error al obtener los datos:', error));
   }, []);
 
-  /**
+    /**
    * Abre el modal y establece el producto seleccionado.
    * @param {Object} todo - Producto seleccionado.
    */

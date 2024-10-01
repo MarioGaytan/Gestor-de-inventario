@@ -1,47 +1,57 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Flex, Button, IconButton, Input, List, ListItem, Drawer, DrawerBody, DrawerFooter, DrawerHeader, DrawerOverlay, DrawerContent, DrawerCloseButton, useDisclosure } from "@chakra-ui/react";
+import { Box, Flex, Button, IconButton, Input, List, ListItem } from "@chakra-ui/react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { AddIcon, SearchIcon, CalendarIcon, InfoIcon } from '@chakra-ui/icons';
-import app from '../../firebase-config';
+import { AddIcon, SearchIcon, InfoIcon } from '@chakra-ui/icons';
 import { signOut, getAuth, onAuthStateChanged } from 'firebase/auth';
 
-export default function Navbar() {
-  const [showSearch, setShowSearch] = useState(false);
+const Navbar = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [items, setItems] = useState([]);
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const auth = getAuth(app);
+  const [showSearch, setShowSearch] = useState(false);
+  const auth = getAuth();
   const navigate = useNavigate();
-
-  const handleSignOut = () => {
-    signOut(auth)
-      .then(() => navigate("/signin", { replace: true }))
-      .catch((error) => alert(`Se perdió la conexión, inténtalo más tarde. \n Error: ${error}`));
-  };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUserAuth(user ? user.email : null);
+      if (!user) {
+        navigate("/signin");
+      }
     });
 
-    fetch('http://localhost:3000/data')
-      .then(response => response.json())
-      .then(data => setItems(data))
-      .catch(error => console.error('Error al obtener los datos:', error));
-
+    fetchData();
     return () => unsubscribe();
-  }, [auth]);
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/data');
+      if (!response.ok) throw new Error(`Error ${response.status}`);
+      const data = await response.json();
+      setItems(data);
+    } catch (error) {
+      console.error('Error al obtener los datos:', error);
+    }
+  };
 
   const filteredItems = items.filter(item =>
     item.nombre.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      navigate("/signin");
+    } catch (error) {
+      alert(`Error: ${error}`);
+    }
+  };
 
   return (
     <Box>
       <Flex bg={"blue.900"} color={"white"} py={2} px={4} align={"center"}>
         <Button onClick={handleSignOut}>Cerrar sesión</Button>
         <Flex ml="auto">
-          <IconButton as={NavLink} to={"/productos"} aria-label="Agregar" icon={<AddIcon />} variant={"ghost"} color="white" />
+          <IconButton as={NavLink} to={"/add_productos"} aria-label="Agregar" icon={<AddIcon />} variant={"ghost"} color="white" />
           <IconButton aria-label="Buscar" icon={<SearchIcon />} variant={"ghost"} onClick={() => setShowSearch(!showSearch)} color="white" />
           <IconButton as={NavLink} to={"/graficas"} aria-label="Gráfica" icon={<InfoIcon />} variant={"ghost"} color="white" />
         </Flex>
@@ -57,7 +67,8 @@ export default function Navbar() {
           </List>
         </Box>
       )}
-
     </Box>
   );
-}
+};
+
+export default Navbar;
