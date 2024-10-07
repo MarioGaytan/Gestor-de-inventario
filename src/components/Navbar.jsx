@@ -3,6 +3,9 @@ import { Box, Flex, Button, IconButton, Input, List, ListItem } from "@chakra-ui
 import { NavLink, useNavigate } from "react-router-dom";
 import { AddIcon, SearchIcon, InfoIcon } from '@chakra-ui/icons';
 import { signOut, getAuth, onAuthStateChanged } from 'firebase/auth';
+import app from '../../firebase-config';
+
+const auth = getAuth(app)
 
 const Navbar = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -37,19 +40,10 @@ const Navbar = () => {
     item.nombre.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleSignOut = async () => {
-    try {
-      await signOut(auth);
-      navigate("/signin");
-    } catch (error) {
-      alert(`Error: ${error}`);
-    }
-  };
-
   return (
     <Box>
       <Flex bg={"blue.900"} color={"white"} py={2} px={4} align={"center"}>
-        <Button onClick={handleSignOut}>Cerrar sesión</Button>
+        <Button onClick={() => signOut(auth)}>Cerrar sesión</Button>
         <Flex ml="auto">
           <IconButton as={NavLink} to={"/add_productos"} aria-label="Agregar" icon={<AddIcon />} variant={"ghost"} color="white" />
           <IconButton aria-label="Buscar" icon={<SearchIcon />} variant={"ghost"} onClick={() => setShowSearch(!showSearch)} color="white" />
