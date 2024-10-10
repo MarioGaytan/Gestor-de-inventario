@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Box, Text } from '@chakra-ui/react';
 import Cards from '../ui-elements/card';
 
-const Products = () => {
+const Products = ({ userRole }) => {
   const url = 'http://localhost:3000/data';
   const [todos, setTodos] = useState([]);
   const [error, setError] = useState(null);
@@ -35,14 +35,15 @@ const Products = () => {
   };
 
   return (
-    <Box p={4}>
+      <Box p={4}>
       {error ? (
         <Text color="red.500">Error: {error}</Text>
       ) : !todos.length ? (
         <Text>Cargando . . .</Text>
       ) : (
-        <Cards todos={todos} onDelete={handleDeleteProduct} />
+        <Cards todos={todos} onDelete={handleDeleteProduct} userRole={userRole} />
       )}
+      <p>User Role: {userRole}</p>
     </Box>
   );
 };

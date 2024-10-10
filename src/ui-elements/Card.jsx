@@ -10,7 +10,7 @@ import { DeleteIcon } from '@chakra-ui/icons';
  * @param {Function} onDelete - Función para eliminar un producto.
  * @param {Function} onUpdate - Función para actualizar la cantidad de un producto.
  */
-function Cards({ onDelete, onUpdate }) {
+function Cards({ onDelete, onUpdate, userRole }) {
   const [todos, setTodos] = useState([]); // Estado para almacenar los productos obtenidos de la API
   const [isOpen, setIsOpen] = useState(false); // Estado para controlar la visibilidad del modal
   const [selectedTodo, setSelectedTodo] = useState(null); // Estado para el producto seleccionado
@@ -126,20 +126,24 @@ function Cards({ onDelete, onUpdate }) {
                     <Text>Descripción: {selectedTodo.descripcion}</Text>
                     <Text>Cantidad actual: {selectedTodo.cantidad}</Text>
                     <Grid templateColumns='repeat(2, 1fr)' gap={6} mt={4}>
-                      <Text>Agregar:</Text>
-                      <Input
-                        type="number"
-                        value={cantidadAgregar}
-                        onChange={e => {
-                          const value = parseInt(e.target.value, 10);
-                          if (!isNaN(value) && value >= 0) {
-                            setCantidadAgregar(value);
-                          }
-                        }}
-                        min="0"
-                        step="1"
-                        placeholder="Cantidad a agregar"
-                      />
+                      {userRole !== 'dueno' && userRole !== 'gerente' ? null : (
+                        <>
+                          <Text>Agregar:</Text>
+                          <Input
+                            type="number"
+                            value={cantidadAgregar}
+                            onChange={e => {
+                              const value = parseInt(e.target.value, 10);
+                              if (!isNaN(value) && value >= 0) {
+                                setCantidadAgregar(value);
+                              }
+                            }}
+                            min="0"
+                            step="1"
+                            placeholder="Cantidad a agregar"
+                          />
+                        </>
+                      )}
                     </Grid>
                     <Grid templateColumns='repeat(2, 1fr)' gap={6} mt={4}>
                       <Text>Retirar:</Text>
@@ -170,9 +174,11 @@ function Cards({ onDelete, onUpdate }) {
               </Button>
               <Box />
               <Box />
-              <Button colorScheme="red" mr={3} onClick={handleDelete} leftIcon={<DeleteIcon />}>
-                Eliminar
-              </Button>
+              {userRole === 'dueno' && (
+                <Button colorScheme="red" mr={3} onClick={handleDelete} leftIcon={<DeleteIcon />}>
+                  Eliminar
+                </Button>
+              )}
             </Grid>
           </ModalFooter>
         </ModalContent>

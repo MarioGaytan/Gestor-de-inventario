@@ -72,7 +72,10 @@ function App() {
 
         {/* Rutas protegidas */}
         <Route element={<Protected isActive={!user} />}>
-          <Route path="/" element={<Products />} />
+          <Route 
+            path="/" 
+            element={user ? <Products userRole={user.rol} /> : <Loading />} // Asegúrate de que user esté disponible
+          />
           <Route path="/add_productos" element={<AddProducts />} />
           <Route path="/graficas" element={<Grafics />} />
         </Route>
