@@ -3,6 +3,7 @@ import { Box, Text } from '@chakra-ui/react';
 import Cards from '../ui-elements/card';
 
 const Products = () => {
+  const url = 'http://localhost:3000/data';
   const [todos, setTodos] = useState([]);
   const [error, setError] = useState(null);
 
