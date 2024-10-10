@@ -49,8 +49,9 @@ function Cards({ todos, onDelete, onUpdate, userRole }) {
   // Función para manejar la actualización de productos
   const handleUpdateProduct = () => {
     if (!selectedTodo) return;
-
+  
     const newCantidad = selectedTodo.cantidad + cantidadAgregar - cantidadRetirar;
+    selectedTodo.cantidad = newCantidad;
 
     // Asegúrate de que la nueva cantidad no sea negativa
     if (newCantidad < 0) {

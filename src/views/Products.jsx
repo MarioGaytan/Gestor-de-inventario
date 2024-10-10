@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Text } from '@chakra-ui/react';
-import Cards from '../ui-elements/card';
+import Cards from '../ui-elements/Card';
 
 const Products = ({ userRole }) => {
   const url = 'http://localhost:3000/data';
@@ -36,24 +36,25 @@ const Products = ({ userRole }) => {
 
   const handleUpdateProduct = async (productId, newCantidad) => {
     try {
-      const response = await fetch(`${url}/${productId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cantidad: newCantidad }),
-      });
-      if (!response.ok) throw new Error('Error al actualizar el producto');
+        const response = await fetch(`${url}/${productId}`, { // Cambia 'id' por 'productId'
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cantidad: newCantidad }), // Cambia 'cantidad' por 'newCantidad'
+        });
+        if (!response.ok) throw new Error('Error al actualizar el producto');
 
-      const updatedProduct = await response.json();
-      // Actualiza el estado con el producto actualizado
-      setTodos(prevProducts =>
-        prevProducts.map(product =>
-          product.id === productId ? updatedProduct : product
-        )
-      );
+        const updatedProduct = await response.json();
+        // Actualiza el estado con el producto actualizado
+        setTodos(prevProducts =>
+            prevProducts.map(product =>
+                product.id === productId ? updatedProduct : product
+            )
+        );
     } catch (error) {
-      console.error('Error al actualizar el producto:', error);
+        console.error('Error al actualizar el producto:', error);
     }
-  };
+};
+
 
   return (
     <Box p={4}>
