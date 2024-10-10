@@ -7,7 +7,7 @@ import Grafics from "./views/Grafics";
 import Page404 from "./views/others/Page404";
 import Navbar from "./components/Navbar";
 import Navbar1 from "./components/Navbar1";
-import Login from "./views/login";
+import SignUp from "./views/SignUp";
 import app from '../firebase-config';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import Protected from './components/Protected';
