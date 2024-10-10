@@ -1,5 +1,3 @@
-// Navbar.jsx
-
 import React, { useState, useEffect } from 'react';
 import { Box, Flex, Button, IconButton, Input, List, ListItem } from "@chakra-ui/react";
 import { NavLink, useNavigate } from "react-router-dom";
