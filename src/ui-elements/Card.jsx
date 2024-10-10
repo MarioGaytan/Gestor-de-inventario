@@ -10,32 +10,19 @@ import { DeleteIcon } from '@chakra-ui/icons';
  * @param {Function} onDelete - Función para eliminar un producto.
  * @param {Function} onUpdate - Función para actualizar la cantidad de un producto.
  */
-function Cards({ onDelete, onUpdate, userRole }) {
-  const [todos, setTodos] = useState([]); // Estado para almacenar los productos obtenidos de la API
+function Cards({ todos, onDelete, onUpdate, userRole }) {
   const [isOpen, setIsOpen] = useState(false); // Estado para controlar la visibilidad del modal
   const [selectedTodo, setSelectedTodo] = useState(null); // Estado para el producto seleccionado
-  const [newCantidad, setNewCantidad] = useState(''); // Estado para la nueva cantidad del producto
   const [cantidadAgregar, setCantidadAgregar] = useState(0); // Estado para la cantidad a agregar
   const [cantidadRetirar, setCantidadRetirar] = useState(0); // Estado para la cantidad a retirar
   const toast = useToast(); // Hook de Chakra UI para notificaciones
 
   /**
-   * useEffect para obtener los datos de la API cuando el componente se monta.
-   */
-  useEffect(() => {
-    fetch('http://localhost:3000/data')
-      .then(response => response.json())
-      .then(data => setTodos(data))
-      .catch(error => console.error('Error al obtener los datos:', error));
-  }, []);
-
-    /**
    * Abre el modal y establece el producto seleccionado.
    * @param {Object} todo - Producto seleccionado.
    */
   const openModal = (todo) => {
     setSelectedTodo(todo);
-    setNewCantidad(todo.cantidad);
     setCantidadAgregar(0); // Restablecer las cantidades de agregar y retirar
     setCantidadRetirar(0);
     setIsOpen(true);
@@ -47,7 +34,8 @@ function Cards({ onDelete, onUpdate, userRole }) {
   const closeModal = () => {
     setIsOpen(false);
     setSelectedTodo(null);
-    setNewCantidad('');
+    setCantidadAgregar(0);
+    setCantidadRetirar(0);
   };
 
   /**
@@ -55,39 +43,35 @@ function Cards({ onDelete, onUpdate, userRole }) {
    */
   const handleDelete = () => {
     onDelete(selectedTodo.id); // Llama a la función de eliminación
-    setTodos(todos.filter(todo => todo.id !== selectedTodo.id)); // Remueve el producto del estado local
     closeModal();
   };
 
-  /**
-   * Maneja la actualización de la cantidad del producto seleccionado.
-   */
-  const handleUpdate = () => {
-    const totalRetirar = parseFloat(cantidadRetirar);
-    const totalAgregar = parseFloat(cantidadAgregar);
-    const cantidadActual = parseFloat(newCantidad);
+  // Función para manejar la actualización de productos
+  const handleUpdateProduct = () => {
+    if (!selectedTodo) return;
 
-    // Validaciones de las cantidades
-    if (totalRetirar > cantidadActual) {
+    const newCantidad = selectedTodo.cantidad + cantidadAgregar - cantidadRetirar;
+
+    // Asegúrate de que la nueva cantidad no sea negativa
+    if (newCantidad < 0) {
       toast({
-        title: 'Error',
-        description: 'No puedes retirar más de lo que existe',
-        status: 'error',
+        title: "Error",
+        description: "La cantidad no puede ser negativa.",
+        status: "error",
         duration: 3000,
         isClosable: true,
       });
       return;
     }
 
-    const cantidadFinal = cantidadActual - totalRetirar + totalAgregar;
-
-    // Actualiza el producto localmente
-    const updatedTodos = todos.map(todo =>
-      todo.id === selectedTodo.id ? { ...todo, cantidad: cantidadFinal } : todo
-    );
-
-    setTodos(updatedTodos);
-    onUpdate(selectedTodo.id, cantidadFinal); // Llama a la función onUpdate con la nueva cantidad
+    onUpdate(selectedTodo.id, newCantidad); // Llama a la función que actualiza el producto
+    toast({
+      title: "Producto actualizado.",
+      description: `La nueva cantidad es ${newCantidad}.`,
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
     closeModal();
   };
 
@@ -132,12 +116,7 @@ function Cards({ onDelete, onUpdate, userRole }) {
                           <Input
                             type="number"
                             value={cantidadAgregar}
-                            onChange={e => {
-                              const value = parseInt(e.target.value, 10);
-                              if (!isNaN(value) && value >= 0) {
-                                setCantidadAgregar(value);
-                              }
-                            }}
+                            onChange={e => setCantidadAgregar(Math.max(0, parseInt(e.target.value) || 0))}
                             min="0"
                             step="1"
                             placeholder="Cantidad a agregar"
@@ -150,15 +129,10 @@ function Cards({ onDelete, onUpdate, userRole }) {
                       <Input
                         type="number"
                         value={cantidadRetirar}
-                        onChange={e => {
-                          const value = parseInt(e.target.value, 10);
-                          if (!isNaN(value) && value >= 0) {
-                            setCantidadRetirar(value);
-                          }
-                        }}
+                        onChange={e => setCantidadRetirar(Math.max(0, Math.min(parseInt(e.target.value) || 0, selectedTodo.cantidad)))}
                         min="0"
                         step="1"
-                        max={newCantidad}
+                        max={selectedTodo.cantidad}
                         placeholder="Cantidad a retirar"
                       />
                     </Grid>
@@ -169,7 +143,7 @@ function Cards({ onDelete, onUpdate, userRole }) {
           </ModalBody>
           <ModalFooter justifyContent="center">
             <Grid templateColumns='repeat(4, 1fr)'>
-              <Button colorScheme="blue" onClick={handleUpdate}>
+              <Button colorScheme="blue" onClick={handleUpdateProduct}>
                 Actualizar
               </Button>
               <Box />

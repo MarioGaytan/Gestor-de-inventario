@@ -13,7 +13,7 @@ const Products = ({ userRole }) => {
 
   const fetchData = async () => {
     try {
-      const response = await fetch('http://localhost:3000/data');
+      const response = await fetch(url);
       if (!response.ok) throw new Error(`Error ${response.status}`);
       const data = await response.json();
       setTodos(data);
@@ -34,18 +34,40 @@ const Products = ({ userRole }) => {
     }
   };
 
+  const handleUpdateProduct = async (productId, newCantidad) => {
+    try {
+      const response = await fetch(`${url}/${productId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cantidad: newCantidad }),
+      });
+      if (!response.ok) throw new Error('Error al actualizar el producto');
+
+      const updatedProduct = await response.json();
+      // Actualiza el estado con el producto actualizado
+      setTodos(prevProducts =>
+        prevProducts.map(product =>
+          product.id === productId ? updatedProduct : product
+        )
+      );
+    } catch (error) {
+      console.error('Error al actualizar el producto:', error);
+    }
+  };
+
   return (
-      <Box p={4}>
+    <Box p={4}>
       {error ? (
         <Text color="red.500">Error: {error}</Text>
       ) : !todos.length ? (
         <Text>Cargando . . .</Text>
-      ) : (
-        <Cards todos={todos} onDelete={handleDeleteProduct} userRole={userRole} />
+      ) : (<Cards todos={todos} onDelete={handleDeleteProduct} onUpdate={handleUpdateProduct} userRole={userRole} />
       )}
-      <p>User Role: {userRole}</p>
+      <Text mt={4}>User Role: {userRole}</Text>
     </Box>
   );
 };
 
 export default Products;
+
+       
