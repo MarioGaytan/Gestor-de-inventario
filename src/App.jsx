@@ -6,7 +6,6 @@ import SignIn from "./views/SignIn";
 import Grafics from "./views/Grafics";
 import Page404 from "./views/others/Page404";
 import Navbar from "./components/Navbar";
-import Navbar1 from "./components/Navbar1";
 import SignUp from "./views/SignUp";
 import app from '../firebase-config';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
@@ -61,8 +60,9 @@ function App() {
 
   return (
     <>
-      {location.pathname !== "/signin" && user?.rol === "gerente" || user?.rol === "trabajador" ? <Navbar1 /> : null}
-      {location.pathname !== "/signin" && user?.rol === "dueno" ? <Navbar /> : null}
+
+      {/* En App.jsx */}
+      {location.pathname !== "/signin" && user ? <Navbar userRole={user.rol} /> : null}
 
       <Routes>
         <Route
