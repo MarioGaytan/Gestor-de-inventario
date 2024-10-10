@@ -4,6 +4,12 @@ import {
   ModalCloseButton, Button, Input, Grid, Box, useToast
 } from '@chakra-ui/react';
 import { DeleteIcon } from '@chakra-ui/icons';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import app from '../../firebase-config';
+import { getFirestore, doc, getDoc } from "firebase/firestore";
+
+const auth = getAuth(app);
+const firestore = getFirestore(app);
 
 /**
  * Componente Cards que muestra una lista de tarjetas con información de productos.
@@ -11,6 +17,7 @@ import { DeleteIcon } from '@chakra-ui/icons';
  * @param {Function} onUpdate - Función para actualizar la cantidad de un producto.
  */
 function Cards({ onDelete, onUpdate }) {
+  const [user, setUser] = useState(null);
   const [todos, setTodos] = useState([]); // Estado para almacenar los productos obtenidos de la API
   const [isOpen, setIsOpen] = useState(false); // Estado para controlar la visibilidad del modal
   const [selectedTodo, setSelectedTodo] = useState(null); // Estado para el producto seleccionado
@@ -29,10 +36,10 @@ function Cards({ onDelete, onUpdate }) {
       .catch(error => console.error('Error al obtener los datos:', error));
   }, []);
 
-    /**
-   * Abre el modal y establece el producto seleccionado.
-   * @param {Object} todo - Producto seleccionado.
-   */
+  /**
+ * Abre el modal y establece el producto seleccionado.
+ * @param {Object} todo - Producto seleccionado.
+ */
   const openModal = (todo) => {
     setSelectedTodo(todo);
     setNewCantidad(todo.cantidad);
@@ -89,7 +96,43 @@ function Cards({ onDelete, onUpdate }) {
     setTodos(updatedTodos);
     onUpdate(selectedTodo.id, cantidadFinal); // Llama a la función onUpdate con la nueva cantidad
     closeModal();
-  };
+
+    async function getRol(uid) {
+      const docuRef = doc(firestore, `Usuarios/${uid}`);
+      const docuCifrada = await getDoc(docuRef);
+      const infoFinal = docuCifrada.data().rol;
+      return infoFinal;
+    }
+
+    function setUserWithFirebaseAndRol(usuarioFirebase) {
+      getRol(usuarioFirebase.uid).then((rol) => { // Corregido .them a .then
+        const userData = {
+          uid: usuarioFirebase.uid,
+          email: usuarioFirebase.email,
+          rol: rol,
+        };
+        setUser(userData);
+        console.log("userData final", userData);
+        console.log("User Role:", usuarioFirebase.rol);
+      });
+    }
+
+    useEffect(() => {
+      onAuthStateChanged(auth, (usuarioFirebase) => {
+        if (usuarioFirebase) {
+
+          setUserWithFirebaseAndRol(usuarioFirebase);
+
+        } else {
+          setUser(null);
+        }
+        setLoading(false);
+      });
+    }, []);
+    if (loading) {
+      return <div>Cargando...</div>;
+    };
+  }
 
   return (
     <>
@@ -170,9 +213,10 @@ function Cards({ onDelete, onUpdate }) {
               </Button>
               <Box />
               <Box />
-              <Button colorScheme="red" mr={3} onClick={handleDelete} leftIcon={<DeleteIcon />}>
-                Eliminar
-              </Button>
+              {user?.rol === "dueno" ?
+                null : <Button colorScheme="red" mr={3} onClick={handleDelete} leftIcon={<DeleteIcon />}>
+                  Eliminar
+                </Button>}
             </Grid>
           </ModalFooter>
         </ModalContent>
