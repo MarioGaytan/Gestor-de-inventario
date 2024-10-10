@@ -6,7 +6,7 @@ import { getFirestore, doc, collection, setDoc } from "firebase/firestore";
 const auth = getAuth(app);
 
 
-function Login() {
+function SignUp() {
     const firestore = getFirestore(app);
     async function registrarUsuario(email, password, rol) {
         const infoUsuario = await createUserWithEmailAndPassword(auth, email, password)
@@ -63,4 +63,4 @@ function Login() {
     );
 }
 
-export default Login;
+export default SignUp;
