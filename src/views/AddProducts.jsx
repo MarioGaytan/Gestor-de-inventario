@@ -6,8 +6,8 @@ import { useNavigate } from 'react-router-dom';
  * Componente Home que permite agregar un producto a la API REST.
  */
 function Home() {
-  const navigate = useNavigate();
-  const toast = useToast();
+  const navigate = useNavigate(); // Navegación entre páginas
+  const toast = useToast(); // Para mostrar mensajes emergentes
   const [nombre, setNombre] = useState(''); // Estado para el nombre del producto
   const [descripcion, setDescripcion] = useState(''); // Estado para la descripción del producto
   const [cantidad, setCantidad] = useState(''); // Estado para la cantidad del producto
@@ -17,7 +17,7 @@ function Home() {
    * @param {Event} e - Evento de envío del formulario.
    */
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); // Evita que la página se recargue al enviar el formulario
     const newProduct = { nombre, descripcion, cantidad };
 
     try {
@@ -26,7 +26,7 @@ function Home() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(newProduct),
+        body: JSON.stringify(newProduct), // Convierte el objeto a JSON
       });
 
       if (response.ok) {
@@ -37,11 +37,11 @@ function Home() {
           duration: 5000,
           isClosable: true,
         });
-        setNombre('');
-        setDescripcion('');
-        setCantidad('');
+        setNombre(''); // Reinicia el campo de nombre
+        setDescripcion(''); // Reinicia el campo de descripción
+        setCantidad(''); // Reinicia el campo de cantidad
       } else {
-        throw new Error('Error al agregar el producto');
+        throw new Error('Error al agregar el producto'); // Lanza un error si la respuesta no es OK
       }
     } catch (error) {
       toast({
@@ -62,7 +62,7 @@ function Home() {
           <FormLabel>Nombre</FormLabel>
           <Input
             value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
+            onChange={(e) => setNombre(e.target.value)} // Actualiza el estado con el valor ingresado
             placeholder="Nombre del producto"
           />
         </FormControl>
@@ -70,16 +70,16 @@ function Home() {
           <FormLabel>Descripción</FormLabel>
           <Input
             value={descripcion}
-            onChange={(e) => setDescripcion(e.target.value)}
+            onChange={(e) => setDescripcion(e.target.value)} // Actualiza el estado con el valor ingresado
             placeholder="Descripción del producto"
           />
         </FormControl>
         <FormControl id="cantidad" mt={4} isRequired>
           <FormLabel>Cantidad</FormLabel>
           <Input
-            type="number"
+            type="number" // Campo solo para números
             value={cantidad}
-            onChange={(e) => setCantidad(e.target.value)}
+            onChange={(e) => setCantidad(e.target.value)} // Actualiza el estado con el valor ingresado
             placeholder="Cantidad"
           />
         </FormControl>
