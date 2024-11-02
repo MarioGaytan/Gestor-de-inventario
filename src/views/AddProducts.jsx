@@ -8,9 +8,10 @@ import { useNavigate } from 'react-router-dom';
 function Home() {
   const navigate = useNavigate();
   const toast = useToast();
+  const [id, setId] = useState('');
   const [nombre, setNombre] = useState(''); // Estado para el nombre del producto
   const [descripcion, setDescripcion] = useState(''); // Estado para la descripción del producto
-  const [cantidad, setCantidad] = useState(''); // Estado para la cantidad del producto
+  const [cantidad, setCantidad] = useState(0); / / // Estado para la cantidad del producto
 
   /**
    * Maneja el envío del formulario para agregar un nuevo producto.
@@ -18,10 +19,10 @@ function Home() {
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const newProduct = { nombre, descripcion, cantidad };
+    const newProduct = { id, nombre, descripcion, cantidad };
 
     try {
-      const response = await fetch('http://localhost:3000/data', {
+      const response = await fetch('http://localhost:3000/productos', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -37,6 +38,7 @@ function Home() {
           duration: 5000,
           isClosable: true,
         });
+        setId('');
         setNombre('');
         setDescripcion('');
         setCantidad('');
@@ -79,7 +81,9 @@ function Home() {
           <Input
             type="number"
             value={cantidad}
-            onChange={(e) => setCantidad(e.target.value)}
+            onChange={(e) => setCantidad(Math.max(0, parseInt(e.target.value) || 0))}
+            min="0"
+            step="1"
             placeholder="Cantidad"
           />
         </FormControl>

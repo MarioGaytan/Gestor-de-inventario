@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Flex, Button, IconButton, Input, List, ListItem } from "@chakra-ui/react";
+import { Box, Flex, Button, IconButton, Input, List, ListItem, Text } from "@chakra-ui/react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { AddIcon, SearchIcon, InfoIcon } from '@chakra-ui/icons';
 import { signOut, getAuth, onAuthStateChanged } from 'firebase/auth';
@@ -7,10 +7,12 @@ import app from '../../firebase-config';
 
 const auth = getAuth(app);
 
-const Navbar = ({ userRole }) => {
+const Navbar = ({ userRole, onFilterChange }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [items, setItems] = useState([]);
+  const [filteredItems, setFilteredItems] = useState([]); // Para almacenar solo los productos filtrados
   const [showSearch, setShowSearch] = useState(false);
+  const [noResults, setNoResults] = useState(false); // Para mostrar mensaje si no hay resultados
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,24 +22,40 @@ const Navbar = ({ userRole }) => {
       }
     });
 
-    fetchData();
+    fetchData(); // Cargar productos al inicio
     return () => unsubscribe();
   }, []);
 
   const fetchData = async () => {
     try {
-      const response = await fetch('http://localhost:3000/data');
+      const response = await fetch('http://localhost:3000/productos');
       if (!response.ok) throw new Error(`Error ${response.status}`);
-      const data = await response.json();
-      setItems(data);
+      const productos = await response.json();
+      setItems(productos.data || []); // Guardar todos los productos en `items`
+      setFilteredItems(productos.data || []); // Inicializar `filteredItems` con todos los productos
     } catch (error) {
       console.error('Error al obtener los datos:', error);
     }
   };
 
-  const filteredItems = items.filter(item =>
-    item.nombre.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+
+    // Filtrar los productos según el término de búsqueda
+    if (value.trim()) {
+      const results = items.filter(item =>
+        item.nombre.toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredItems(results);
+      setNoResults(results.length === 0); // Mostrar mensaje si no hay coincidencias
+      onFilterChange(results); // Enviar los resultados filtrados
+    } else {
+      setFilteredItems(items); // Mostrar todos si no hay término de búsqueda
+      setNoResults(false);
+      onFilterChange(items); // Enviar todos los productos si no hay término de búsqueda
+    }
+  };
 
   return (
     <Box>
@@ -60,11 +78,15 @@ const Navbar = ({ userRole }) => {
 
       {showSearch && (
         <Box p={4} bg="white" color="black">
-          <Input placeholder="Buscar..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+          <Input placeholder="Buscar..." value={searchTerm} onChange={handleSearchChange} />
           <List mt={4}>
-            {filteredItems.map((item, index) => (
-              <ListItem key={index}>{item.nombre}</ListItem>
-            ))}
+            {noResults ? (
+              <Text color="gray.500">No se encontraron resultados</Text>
+            ) : (
+              filteredItems.map((item) => (
+                <ListItem key={item.id}>{item.nombre}</ListItem>
+              ))
+            )}
           </List>
         </Box>
       )}

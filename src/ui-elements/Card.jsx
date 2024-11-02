@@ -43,6 +43,12 @@ function Cards({ todos, onDelete, onUpdate, userRole }) {
    */
   const handleDelete = () => {
     onDelete(selectedTodo.id); // Llama a la función de eliminación
+    toast({
+      title: "Producto Eliminado",
+      status: "error",
+      duration: 3000,
+      isClosable: true,
+    });
     closeModal();
   };
 
@@ -51,7 +57,6 @@ function Cards({ todos, onDelete, onUpdate, userRole }) {
     if (!selectedTodo) return;
   
     const newCantidad = selectedTodo.cantidad + cantidadAgregar - cantidadRetirar;
-    selectedTodo.cantidad = newCantidad;
 
     // Asegúrate de que la nueva cantidad no sea negativa
     if (newCantidad < 0) {
@@ -65,7 +70,7 @@ function Cards({ todos, onDelete, onUpdate, userRole }) {
       return;
     }
 
-    onUpdate(selectedTodo.id, newCantidad); // Llama a la función que actualiza el producto
+    onUpdate(selectedTodo.id, { ...selectedTodo, cantidad: newCantidad }); // Llama a la función que actualiza el producto
     toast({
       title: "Producto actualizado.",
       description: `La nueva cantidad es ${newCantidad}.`,

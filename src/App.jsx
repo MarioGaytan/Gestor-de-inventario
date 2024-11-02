@@ -20,6 +20,7 @@ function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const location = useLocation();
+  const [filteredProducts, setFilteredProducts] = useState([]);
 
   async function getRol(uid) {
     const docuRef = doc(firestore, `Usuarios/${uid}`);
@@ -62,7 +63,7 @@ function App() {
     <>
 
       {/* En App.jsx */}
-      {location.pathname !== "/signin" && user ? <Navbar userRole={user.rol} /> : null}
+      {location.pathname !== "/signin" && user ? <Navbar  userRole={user.rol} /> : null}
 
       <Routes>
         <Route
@@ -73,7 +74,8 @@ function App() {
         {/* Rutas protegidas */}
         <Route element={<Protected isActive={!user} />}>
           <Route 
-            path="/" 
+            path="/"
+            todosFiltrados={filteredProducts} 
             element={user ? <Products userRole={user.rol} /> : <Loading />}
           />
           <Route path="/add_productos" element={<AddProducts />} />
