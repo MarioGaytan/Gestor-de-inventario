@@ -99,7 +99,7 @@ function Cards({ todos, onDelete, onUpdate, userRole, idUsuario }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          idUsuario: userRole === 'trabajador' ? null : idUsuario,
+          idUsuario: idUsuario,
           idProducto: selectedTodo?.id,
           cantidad: cantidadRetirar,
         }),
