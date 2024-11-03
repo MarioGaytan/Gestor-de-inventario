@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Box, Text, Input } from '@chakra-ui/react';
 import Cards from '../ui-elements/Card';
 
-const Products = ({ userRole }) => {
+const Products = ({ userRole, idUsuario }) => {
   const url = 'http://localhost:3000/productos';
   const [todos, setTodos] = useState([]);
   const [filteredTodos, setFilteredTodos] = useState([]); // Nuevo estado para productos filtrados
@@ -92,7 +92,7 @@ const Products = ({ userRole }) => {
       ) : !filteredTodos.length ? (
         <Text>No se encontraron productos</Text>
       ) : (
-        <Cards todos={filteredTodos} onDelete={handleDeleteProduct} onUpdate={handleUpdateProduct} userRole={userRole} />
+        <Cards todos={filteredTodos} onDelete={handleDeleteProduct} onUpdate={handleUpdateProduct} userRole={userRole} idUsuario={idUsuario} />
       )}
       <Text mt={4}>User Role: {userRole}</Text>
     </Box>

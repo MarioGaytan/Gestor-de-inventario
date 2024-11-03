@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Card, CardBody, Text, SimpleGrid, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody,
   ModalCloseButton, Button, Input, Grid, Box, useToast
@@ -10,12 +10,13 @@ import { DeleteIcon } from '@chakra-ui/icons';
  * @param {Function} onDelete - Función para eliminar un producto.
  * @param {Function} onUpdate - Función para actualizar la cantidad de un producto.
  */
-function Cards({ todos, onDelete, onUpdate, userRole }) {
+function Cards({ todos, onDelete, onUpdate, userRole, idUsuario }) {
   const [isOpen, setIsOpen] = useState(false); // Estado para controlar la visibilidad del modal
   const [selectedTodo, setSelectedTodo] = useState(null); // Estado para el producto seleccionado
   const [cantidadAgregar, setCantidadAgregar] = useState(0); // Estado para la cantidad a agregar
   const [cantidadRetirar, setCantidadRetirar] = useState(0); // Estado para la cantidad a retirar
   const toast = useToast(); // Hook de Chakra UI para notificaciones
+  const apiURL = 'http://localhost:3000/ventas'; // URL de la API de ventas
 
   /**
    * Abre el modal y establece el producto seleccionado.
@@ -52,10 +53,12 @@ function Cards({ todos, onDelete, onUpdate, userRole }) {
     closeModal();
   };
 
-  // Función para manejar la actualización de productos
-  const handleUpdateProduct = () => {
+  /**
+   * Función para manejar la actualización de productos y la creación de ventas.
+   */
+  const handleUpdateProduct = async () => {
     if (!selectedTodo) return;
-  
+
     const newCantidad = selectedTodo.cantidad + cantidadAgregar - cantidadRetirar;
 
     // Asegúrate de que la nueva cantidad no sea negativa
@@ -78,7 +81,47 @@ function Cards({ todos, onDelete, onUpdate, userRole }) {
       duration: 3000,
       isClosable: true,
     });
+
+    // Crear venta automáticamente si se ha retirado una cantidad
+    if (cantidadRetirar > 0) {
+      await handleCreateSale(); // Llamar a la función para crear la venta
+    }
+
     closeModal();
+  };
+
+  /**
+   * Función para manejar la creación del registro de venta si se ha retirado una cantidad.
+   */
+  const handleCreateSale = async () => {
+    try {
+      const response = await fetch(apiURL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          idUsuario: userRole === 'trabajador' ? null : idUsuario,
+          idProducto: selectedTodo?.id,
+          cantidad: cantidadRetirar,
+        }),
+      });
+
+      if (!response.ok) throw new Error(`Error: ${response.status}`);
+
+      toast({
+        title: 'Venta creada con éxito',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+    } catch (error) {
+      toast({
+        title: 'Error al crear la venta',
+        description: error.message,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    }
   };
 
   return (

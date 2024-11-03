@@ -76,7 +76,11 @@ function App() {
           <Route 
             path="/"
             todosFiltrados={filteredProducts} 
-            element={user ? <Products userRole={user.rol} /> : <Loading />}
+            element={user ? 
+            <Products 
+            userRole={user.rol} 
+            idUsuario={user.uid}
+            /> : <Loading />}
           />
           <Route path="/add_productos" element={<AddProducts />} />
           <Route path="/graficas" element={<Grafics />} />
