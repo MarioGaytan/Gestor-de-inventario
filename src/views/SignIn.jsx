@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import { Box, Grid, Button, Input, FormHelperText, HStack, VStack, FormControl, Checkbox, IconButton } from '@chakra-ui/react';
+import { Box, Grid, Button, Input, FormHelperText, HStack, VStack, FormControl, Checkbox, IconButton, Text } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'; // Importa iconos para mostrar y ocultar
+import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 
 function SignIn() {
   const navigate = useNavigate();
   const auth = getAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // Estado para mostrar/ocultar contraseña
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
 
   const handleLogin = () => {
@@ -19,7 +19,22 @@ function SignIn() {
         console.log("Se autenticó con el email", user.email);
         navigate("/");
       })
-      .catch((error) => alert(error.message));
+      .catch((error) => {
+        // Manejamos diferentes mensajes de error según el código de error de Firebase
+        switch (error.code) {
+          case 'auth/invalid-email':
+            setError("El formato del correo es inválido.");
+            break;
+          case 'auth/invalid-credential':
+            setError("El correo o Contraseña incorrecta.");
+            break;
+          case 'auth/missing-password':
+            setError("Falta contraseña.");
+              break;
+          default:
+            setError("Ocurrió un error inesperado. Inténtalo de nuevo.");
+        }
+      });
   };
 
   return (
@@ -53,7 +68,7 @@ function SignIn() {
               <FormControl>
                 <Input 
                   placeholder="Contraseña" 
-                  type={showPassword ? 'text' : 'password'} // Cambia entre text y password
+                  type={showPassword ? 'text' : 'password'}
                   onChange={(e) => setPassword(e.target.value)}
                 />
                 <HStack>
@@ -66,6 +81,8 @@ function SignIn() {
                   <FormHelperText>{showPassword ? 'Contraseña visible' : 'Contraseña oculta'}</FormHelperText>
                 </HStack>
               </FormControl>
+
+              {error && <Text color="red.500">{error}</Text>} {/* Mensaje de error */}
 
               <HStack w='full' justify='space-between'>
                 <Checkbox>Recordarme.</Checkbox>

@@ -75,6 +75,7 @@ const Products = ({ userRole, idUsuario }) => {
         product.nombre.toLowerCase().includes(searchTerm.toLowerCase())
       ));
     } catch (error) {
+      setError(error.message);
       console.error('Error al actualizar el producto:', error);
     }
   };

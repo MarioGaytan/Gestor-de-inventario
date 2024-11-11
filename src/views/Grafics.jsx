@@ -16,6 +16,7 @@ function Grafics() {
   const [ventasData, setVentasData] = useState([]);
   const [productosData, setProductosData] = useState([]);
   const navigate = useNavigate();
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchVentas = async () => {
@@ -49,6 +50,7 @@ function Grafics() {
           setVentasData(Object.values(ventasPorUsuario));
         }
       } catch (error) {
+        setError(error.message);
         console.error('Error al obtener ventas:', error);
       }
     };
@@ -76,6 +78,7 @@ function Grafics() {
           setProductosData(productosConNombres);
         }
       } catch (error) {
+        setError(error.message);
         console.error('Error al obtener productos:', error);
       }
     };
