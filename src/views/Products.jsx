@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Text, Input } from '@chakra-ui/react';
 import Cards from '../ui-elements/Card';
+import AsyncLock from 'async-lock'
 
 const Products = ({ userRole, idUsuario }) => {
   const url = 'http://localhost:3000/productos';
@@ -13,6 +14,8 @@ const Products = ({ userRole, idUsuario }) => {
     fetchData();
   }, []);
 
+
+  
   const fetchData = async () => {
     try {
       const response = await fetch(url);
@@ -37,6 +40,7 @@ const Products = ({ userRole, idUsuario }) => {
     );
     setFilteredTodos(filtered);
   };
+  
 
   const handleDeleteProduct = async (id) => {
     try {
