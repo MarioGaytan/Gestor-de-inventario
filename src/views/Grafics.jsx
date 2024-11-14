@@ -17,6 +17,7 @@ function Grafics() {
   const [productosData, setProductosData] = useState([]);
   const navigate = useNavigate();
   const [error, setError] = useState(null);
+  const SCROLL_THRESHOLD = 10; // Define el número mínimo de productos o usuarios para activar el scroll
 
   useEffect(() => {
     const fetchVentas = async () => {
@@ -98,30 +99,34 @@ function Grafics() {
       <Grid templateColumns="repeat(2, 1fr)" gap={6} alignItems="center">
         <Box>
           <h2>Ventas por Usuario</h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={ventasData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="email" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="vendidos" fill="#4CAF50" /> {/* Color verde */}
-            </BarChart>
-          </ResponsiveContainer>
+          <div style={{ overflowX: ventasData.length > SCROLL_THRESHOLD ? 'auto' : 'hidden' }}>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={ventasData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="email" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="vendidos" fill="#4CAF50" /> {/* Color verde */}
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </Box>
 
         <Box>
           <h2>Productos Vendidos</h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={productosData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="nombre" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="vendidos" fill="#4287f5" /> {/* Color azul */}
-            </BarChart>
-          </ResponsiveContainer>
+          <div style={{ overflowX: productosData.length > SCROLL_THRESHOLD ? 'auto' : 'hidden' }}>
+          <ResponsiveContainer width={productosData.length > SCROLL_THRESHOLD ? '150%' : '100%'} height={300}>
+          <BarChart data={productosData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="nombre" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="vendidos" fill="#4287f5" /> {/* Color azul */}
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </Box>
       </Grid>
     </div>
