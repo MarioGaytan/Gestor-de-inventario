@@ -83,10 +83,12 @@ function Home() {
             value={cantidad}
             onChange={(e) => setCantidad(Math.max(0, parseInt(e.target.value) || 0))}
             min="0"
+            max="10000000" // Límite máximo de 10,000,000
             step="1"
             placeholder="Cantidad"
           />
         </FormControl>
+
         <Button mt={4} colorScheme="teal" type="submit">Agregar Producto</Button>
       </Box>
     </Box>
