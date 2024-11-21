@@ -20,6 +20,8 @@ function Cards({ productos, onDelete, onUpdate, userRole, idUsuario }) {
   const [selectedTodo, setSelectedTodo] = useState(null); // Estado para el producto seleccionado
   const [cantidadAgregar, setCantidadAgregar] = useState(0); // Estado para la cantidad a agregar
   const [cantidadRetirar, setCantidadRetirar] = useState(0); // Estado para la cantidad a retirar
+  const [confirmAction, setConfirmAction] = useState(null); // Manejar confirmaciones
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false); // Estado para el modal de confirmación
   const toast = useToast(); // Hook de Chakra UI para notificaciones
   const apiURL = 'http://localhost:3000/ventas'; // URL de la API de ventas
 
@@ -55,55 +57,70 @@ function Cards({ productos, onDelete, onUpdate, userRole, idUsuario }) {
     setCantidadRetirar(0);
   };
 
+  const handleConfirm = (actionType, actionCallback) => {
+    setConfirmAction({ type: actionType, callback: actionCallback });
+    setIsConfirmOpen(true);
+  };
+  
+  const executeConfirmedAction = () => {
+    if (confirmAction?.callback) confirmAction.callback();
+    setIsConfirmOpen(false);
+  };
+  
+
   /**
    * Maneja la eliminación del producto seleccionado.
    */
   const handleDelete = () => {
-    onDelete(selectedTodo.id); // Llama a la función de eliminación
-    toast({
-      title: "Producto Eliminado",
-      status: "error",
-      duration: 3000,
-      isClosable: true,
+    handleConfirm( 'delete', () => {
+      onDelete(selectedTodo.id); // Llama a la función de eliminación
+      toast({
+        title: 'Producto Eliminado',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      closeModal();
     });
-    closeModal();
   };
 
   /**
    * Función para manejar la actualización de productos y la creación de ventas.
    */
-  const handleUpdateProduct = async () => {
-    if (!selectedTodo) return;
+  const handleUpdateProduct = () => {
+    handleConfirm('update',() => {
+      if (!selectedTodo) return;
 
-    const newCantidad = selectedTodo.cantidad + cantidadAgregar - cantidadRetirar;
+      const newCantidad = selectedTodo.cantidad + cantidadAgregar - cantidadRetirar;
+  
+      // Asegúrate de que la nueva cantidad no sea negativa
+      if (newCantidad < 0) {
+        toast({
+          title: "Error",
+          description: "La cantidad no puede ser negativa.",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+        return;
+      }  
 
-    // Asegúrate de que la nueva cantidad no sea negativa
-    if (newCantidad < 0) {
+      onUpdate(selectedTodo.id, { ...selectedTodo, cantidad: newCantidad });
       toast({
-        title: "Error",
-        description: "La cantidad no puede ser negativa.",
-        status: "error",
+        title: 'Producto actualizado.',
+        description: `La nueva cantidad es ${newCantidad}.`,
+        status: 'success',
         duration: 3000,
         isClosable: true,
       });
-      return;
-    }
-
-    onUpdate(selectedTodo.id, { ...selectedTodo, cantidad: newCantidad }); // Llama a la función que actualiza el producto
-    toast({
-      title: "Producto actualizado.",
-      description: `La nueva cantidad es ${newCantidad}.`,
-      status: "success",
-      duration: 3000,
-      isClosable: true,
-    });
 
     // Crear venta automáticamente si se ha retirado una cantidad
-    if (cantidadRetirar > 0) {
-      await handleCreateSale(); // Llamar a la función para crear la venta
-    }
+      if (cantidadRetirar > 0) {
+        handleCreateSale(); // Llamar a la función para crear la venta
+      }
 
-    closeModal();
+      closeModal();
+    });
   };
 
   /**
@@ -219,6 +236,34 @@ function Cards({ productos, onDelete, onUpdate, userRole, idUsuario }) {
                 </Button>
               )}
             </Grid>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+      {/* Modal de confirmación */}
+      <Modal isOpen={isConfirmOpen} onClose={() => setIsConfirmOpen(false)}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Confirmar Acción</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            {confirmAction?.type === 'delete' && selectedTodo ? (
+              <Text>
+                ¿Estás seguro que deseas eliminar el producto <strong>{selectedTodo.nombre}</strong>? Esta acción es permanente.
+              </Text>
+            ) : (
+              <Text>
+                ¿Estás seguro que deseas actualizar el producto <strong>{selectedTodo?.nombre}</strong> ajustando las cantidades? 
+                Se agregarán <strong>{cantidadAgregar}</strong> y se retirarán <strong>{cantidadRetirar}</strong>.
+              </Text>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="red" onClick={executeConfirmedAction}>
+              Confirmar
+            </Button>
+            <Button ml={3} onClick={() => setIsConfirmOpen(false)}>
+              Cancelar
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
