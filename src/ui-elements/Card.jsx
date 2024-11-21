@@ -239,7 +239,7 @@ function Cards({ productos, onDelete, onUpdate, userRole, idUsuario }) {
           </ModalFooter>
         </ModalContent>
       </Modal>
-      {/* Modal de confirmación */}
+      {/* Modal de confirmación add*/}
       <Modal isOpen={isConfirmOpen} onClose={() => setIsConfirmOpen(false)}>
         <ModalOverlay />
         <ModalContent>
