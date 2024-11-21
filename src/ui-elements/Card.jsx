@@ -1,22 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-  Card, CardBody, Text, SimpleGrid, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody,
-  ModalCloseButton, Button, Input, Grid, Box, useToast
+  Card, CardBody, Text, SimpleGrid, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Button, Input, Grid, Box, useToast,
 } from '@chakra-ui/react';
 import { DeleteIcon } from '@chakra-ui/icons';
+import { collection, onSnapshot } from 'firebase/firestore';
+import { db } from '../../firebase-config'
 
 /**
  * Componente Cards que muestra una lista de tarjetas con información de productos.
+ * @param {Array} productos - Lista de productos a mostrar.
  * @param {Function} onDelete - Función para eliminar un producto.
  * @param {Function} onUpdate - Función para actualizar la cantidad de un producto.
+ * @param {String} userRole - Rol del usuario (e.g., "dueno", "gerente").
+ * @param {String} idUsuario - ID del usuario actual.
  */
-function Cards({ todos, onDelete, onUpdate, userRole, idUsuario }) {
+function Cards({ productos, onDelete, onUpdate, userRole, idUsuario }) {
+  const [todos, setTodos] = useState([]); // Estado interno para los productos
   const [isOpen, setIsOpen] = useState(false); // Estado para controlar la visibilidad del modal
   const [selectedTodo, setSelectedTodo] = useState(null); // Estado para el producto seleccionado
   const [cantidadAgregar, setCantidadAgregar] = useState(0); // Estado para la cantidad a agregar
   const [cantidadRetirar, setCantidadRetirar] = useState(0); // Estado para la cantidad a retirar
   const toast = useToast(); // Hook de Chakra UI para notificaciones
   const apiURL = 'http://localhost:3000/ventas'; // URL de la API de ventas
+
+  useEffect(() => {
+    // Conectar a la colección de Firestore
+    const unsubscribe = onSnapshot(collection(db, 'productos'), (snapshot) => {
+      const productos = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      setTodos(productos);
+    });
+
+    // Limpia la suscripción cuando el componente se desmonte
+    return () => unsubscribe();
+  }, []);
 
   /**
    * Abre el modal y establece el producto seleccionado.
