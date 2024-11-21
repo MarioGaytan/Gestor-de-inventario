@@ -36,6 +36,29 @@ function Cards({ productos, onDelete, onUpdate, userRole, idUsuario }) {
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    if (selectedTodo) {
+      // Conectar a la colección de Firestore para el producto seleccionado
+      const unsubscribe = onSnapshot(
+        collection(db, 'productos'),
+        (snapshot) => {
+          const productoActualizado = snapshot.docs
+            .map((doc) => ({ id: doc.id, ...doc.data() }))
+            .find((producto) => producto.id === selectedTodo.id);
+  
+          // Actualizar el estado si se encuentra el producto
+          if (productoActualizado) {
+            setSelectedTodo(productoActualizado);
+          }
+        }
+      );
+  
+      // Limpia la suscripción cuando el producto seleccionado cambia o se deselecciona
+      return () => unsubscribe();
+    }
+  }, [selectedTodo]);
+  
+
   /**
    * Abre el modal y establece el producto seleccionado.
    * @param {Object} todo - Producto seleccionado.
