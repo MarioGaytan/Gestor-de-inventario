@@ -26,17 +26,6 @@ function Cards({ productos, onDelete, onUpdate, userRole, idUsuario }) {
   const apiURL = 'http://localhost:3000/ventas'; // URL de la API de ventas
 
   useEffect(() => {
-    // Conectar a la colección de Firestore
-    const unsubscribe = onSnapshot(collection(db, 'productos'), (snapshot) => {
-      const productos = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      setTodos(productos);
-    });
-
-    // Limpia la suscripción cuando el componente se desmonte
-    return () => unsubscribe();
-  }, []);
-
-  useEffect(() => {
     if (selectedTodo) {
       // Conectar a la colección de Firestore para el producto seleccionado
       const unsubscribe = onSnapshot(
@@ -183,7 +172,7 @@ function Cards({ productos, onDelete, onUpdate, userRole, idUsuario }) {
   return (
     <>
       <SimpleGrid columns={[1, 2, 4]} spacing={6}>
-        {todos.map((todo, index) => (
+        {productos.map((todo, index) => (
           <Card key={index} mb={4} boxShadow="md" borderRadius="md" overflow="hidden" onClick={() => openModal(todo)}>
             <CardBody>
               <Grid templateColumns='repeat(2, 1fr)' gap={2}>

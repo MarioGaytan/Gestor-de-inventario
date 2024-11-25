@@ -1,21 +1,38 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Text, Input } from '@chakra-ui/react';
+import { Box, Text } from '@chakra-ui/react';
 import Cards from '../ui-elements/Card';
-import AsyncLock from 'async-lock'
+import { collection, onSnapshot } from 'firebase/firestore';
+import { db } from '../../firebase-config'
 
-const Products = ({ userRole, idUsuario }) => {
+const Products = ({ userRole, idUsuario, searchTerm }) => {
   const url = 'http://localhost:3000/productos';
   const [todos, setTodos] = useState([]);
-  const [filteredTodos, setFilteredTodos] = useState([]); // Nuevo estado para productos filtrados
-  const [searchTerm, setSearchTerm] = useState(''); // Estado para el término de búsqueda
+  const [filteredTodos, setFilteredTodos] = useState([]);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchData();
+    // Conectar a la colección de Firestore
+    const unsubscribe = onSnapshot(collection(db, 'productos'), (snapshot) => {
+      const productos = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      setTodos(productos);
+    });
+
+    // Limpia la suscripción cuando el componente se desmonte
+    return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    // Filtrar productos cada vez que el término de búsqueda cambie
+    if (searchTerm) {
+      const filtered = todos.filter(product =>
+        product.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredTodos(filtered);
+    } else {
+      setFilteredTodos(todos); // Si no hay término de búsqueda, mostrar todos
+    }
+  }, [searchTerm, todos]);
 
-  
   const fetchData = async () => {
     try {
       const response = await fetch(url);
@@ -29,29 +46,15 @@ const Products = ({ userRole, idUsuario }) => {
     }
   };
 
-  // Función para manejar cambios en el campo de búsqueda
-  const handleSearchChange = (e) => {
-    const term = e.target.value;
-    setSearchTerm(term);
-
-    // Filtrar productos que coincidan con el término de búsqueda
-    const filtered = todos.filter(product =>
-      product.nombre.toLowerCase().includes(term.toLowerCase()) // Ajusta el campo según tus datos
-    );
-    setFilteredTodos(filtered);
-  };
-  
-
   const handleDeleteProduct = async (id) => {
     try {
       const response = await fetch(`${url}/${id}`, { method: 'DELETE' });
       if (!response.ok) throw new Error(`Error deleting product with ID ${id}`);
       
-      // Actualiza ambos estados tras la eliminación
       const updatedTodos = todos.filter(todo => todo.id !== id);
       setTodos(updatedTodos);
       setFilteredTodos(updatedTodos.filter(product =>
-        product.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+        product.nombre.toLowerCase().includes(searchTerm?.toLowerCase() || '')
       ));
     } catch (error) {
       setError(error.message);
@@ -69,14 +72,12 @@ const Products = ({ userRole, idUsuario }) => {
       if (!response.ok) throw new Error('Error al actualizar el producto');
 
       const updatedProduct = await response.json();
-
-      // Actualiza ambos estados tras la modificación
       const updatedTodos = todos.map(product =>
         product.id === productId ? updatedProduct : product
       );
       setTodos(updatedTodos);
       setFilteredTodos(updatedTodos.filter(product =>
-        product.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+        product.nombre.toLowerCase().includes(searchTerm?.toLowerCase() || '')
       ));
     } catch (error) {
       setError(error.message);
@@ -86,18 +87,18 @@ const Products = ({ userRole, idUsuario }) => {
 
   return (
     <Box p={4}>
-      <Input
-        placeholder="Buscar producto..."
-        value={searchTerm}
-        onChange={handleSearchChange} // Manejar cambios en la búsqueda
-        mb={4}
-      />
       {error ? (
         <Text color="red.500">Error: {error}</Text>
       ) : !filteredTodos.length ? (
         <Text>No se encontraron productos</Text>
       ) : (
-        <Cards todos={filteredTodos} onDelete={handleDeleteProduct} onUpdate={handleUpdateProduct} userRole={userRole} idUsuario={idUsuario} />
+        <Cards
+          productos={filteredTodos}
+          onDelete={handleDeleteProduct}
+          onUpdate={handleUpdateProduct}
+          userRole={userRole}
+          idUsuario={idUsuario}
+        />
       )}
       <Text mt={4}>User Role: {userRole}</Text>
     </Box>
