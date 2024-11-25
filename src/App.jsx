@@ -22,7 +22,7 @@ function App() {
   const location = useLocation();
   const [searchTerm, setSearchTerm] = useState(""); // Nuevo estado para el término de búsqueda
 
-
+  // Fetch user role from Firestore
   async function getRol(uid) {
     const docuRef = doc(firestore, `Usuarios/${uid}`);
     const docuCifrada = await getDoc(docuRef);
@@ -30,8 +30,9 @@ function App() {
     return infoFinal;
   }
 
+  // Set user data with Firebase user information and role
   function setUserWithFirebaseAndRol(usuarioFirebase) {
-    getRol(usuarioFirebase.uid).then((rol) => { // Corregido .them a .then
+    getRol(usuarioFirebase.uid).then((rol) => {
       const userData = {
         uid: usuarioFirebase.uid,
         email: usuarioFirebase.email,
@@ -43,10 +44,12 @@ function App() {
     });
   }
 
+  // Handle search term change
   const handleSearchChange = (term) => {
     setSearchTerm(term);
   };
 
+  // Listen for authentication state changes
   useEffect(() => {
     onAuthStateChanged(auth, (usuarioFirebase) => {
       if (usuarioFirebase) {
@@ -66,9 +69,7 @@ function App() {
 
   return (
     <>
-
-      {/* En App.jsx */}
-      {location.pathname !== "/signin" && user ? <Navbar  userRole={user.rol} onSearchChange={handleSearchChange}/> : null}
+      {location.pathname !== "/signin" && user ? <Navbar userRole={user.rol} onSearchChange={handleSearchChange} /> : null}
 
       <Routes>
         <Route
@@ -76,22 +77,22 @@ function App() {
           element={user ? <Navigate to="/" replace /> : <SignIn />}
         />
 
-        {/* Rutas protegidas */}
+        {/* Protected routes */}
         <Route element={<Protected isActive={!user} />}>
-          <Route 
+          <Route
             path="/"
-            element={user ? 
-            <Products 
-            userRole={user.rol} 
-            idUsuario={user.uid}
-            searchTerm={searchTerm}
-            /> : <Loading />}
+            element={user ?
+              <Products
+                userRole={user.rol}
+                idUsuario={user.uid}
+                searchTerm={searchTerm}
+              /> : <Loading />}
           />
           <Route path="/add_productos" element={<AddProducts />} />
           <Route path="/graficas" element={<Grafics />} />
         </Route>
 
-        {/* Ruta por defecto si no se encuentra la página */}
+        {/* Default route for non-existing pages */}
         <Route path="/*" element={<Page404 />} />
       </Routes>
     </>

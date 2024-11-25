@@ -8,10 +8,12 @@ import { useNavigate } from 'react-router-dom';
 function Home() {
   const navigate = useNavigate();
   const toast = useToast();
+
+  // Definir estados para los campos del formulario
   const [id, setId] = useState('');
   const [nombre, setNombre] = useState(''); // Estado para el nombre del producto
   const [descripcion, setDescripcion] = useState(''); // Estado para la descripción del producto
-  const [cantidad, setCantidad] = useState(0); / / // Estado para la cantidad del producto
+  const [cantidad, setCantidad] = useState(0); // Estado para la cantidad del producto
 
   /**
    * Maneja el envío del formulario para agregar un nuevo producto.
@@ -19,9 +21,12 @@ function Home() {
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Crear objeto con los datos del nuevo producto
     const newProduct = { id, nombre, descripcion, cantidad };
 
     try {
+      // Enviar solicitud POST a la API para agregar el nuevo producto
       const response = await fetch('http://localhost:3000/productos', {
         method: 'POST',
         headers: {
@@ -30,6 +35,7 @@ function Home() {
         body: JSON.stringify(newProduct),
       });
 
+      // Mostrar mensaje de éxito o error según la respuesta de la API
       if (response.ok) {
         toast({
           title: 'Producto agregado.',
@@ -38,6 +44,8 @@ function Home() {
           duration: 5000,
           isClosable: true,
         });
+
+        // Reiniciar los campos del formulario
         setId('');
         setNombre('');
         setDescripcion('');
@@ -46,6 +54,7 @@ function Home() {
         throw new Error('Error al agregar el producto');
       }
     } catch (error) {
+      // Mostrar mensaje de error en caso de fallo
       toast({
         title: 'Error.',
         description: 'Hubo un problema al agregar el producto.',
@@ -88,7 +97,6 @@ function Home() {
             placeholder="Cantidad"
           />
         </FormControl>
-
         <Button mt={4} colorScheme="teal" type="submit">Agregar Producto</Button>
       </Box>
     </Box>
