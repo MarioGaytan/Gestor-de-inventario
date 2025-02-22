@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
-import { Box, Grid, Button, Input, FormHelperText, HStack, VStack, FormControl, Checkbox, IconButton, Text } from '@chakra-ui/react';
+import {
+  Box, Grid, Button, Input, FormHelperText, HStack, VStack, FormControl,
+  Checkbox, IconButton, Text, Heading, Image, useColorModeValue, Flex
+} from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
@@ -30,7 +33,7 @@ function SignIn() {
             break;
           case 'auth/missing-password':
             setError("Falta contraseña.");
-              break;
+            break;
           default:
             setError("Ocurrió un error inesperado. Inténtalo de nuevo.");
         }
@@ -38,62 +41,95 @@ function SignIn() {
   };
 
   return (
-    <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
+    <Flex
+      align="center"
+      justify="center"
       height="100vh"
-      backgroundImage={"https://img.freepik.com/vector-premium/descarga-gratuita-imagenes-fondo-freepik_689361-61.jpg"}
+      backgroundImage="url('https://img.freepik.com/vector-premium/descarga-gratuita-imagenes-fondo-freepik_689361-61.jpg')"
       backgroundSize="cover"
       backgroundPosition="center"
-      w={"100%"}
     >
-      <Box p={4} bg="white" borderRadius="md" shadow="md" alignItems="center">
-        <HStack spacing={4} align='flex-start' w='full'>
-          <VStack spacing={1} align={['flex-start', 'center']} w='full'>
-            <h1>Gestor De Inventario</h1>
-            <h2>Login</h2>
-            <p>Introduce correo y contraseña</p>
-          </VStack>
-        </HStack>
-        <HStack p={"30px"} bg={"white"} borderRadius={"30px"}>
-          <img
-            src="https://img.freepik.com/foto-gratis/vasto-edificio-almacenamiento-lleno-productos-colocados-estantes-industriales-etiquetas_482257-83423.jpg?t=st=1725856085~exp=1725859685~hmac=1f5a029f2159c7a4de16684c9bfa45cb216a887c01048c9959dabeb0722f0d3f&w=250"
-            alt="Imagen de un almacén"
+      <Box
+        bg={useColorModeValue("white", "gray.800")}
+        p={8}
+        rounded="lg"
+        shadow="lg"
+        width={{ base: "90%", md: "400px" }}
+        textAlign="center"
+      >
+        <VStack spacing={4}>
+          <Image
+            src="/LOGO.svg"
+            alt="Logo de la empresa"
+            boxSize="80px"
+            objectFit="cover"
           />
-          <Box bg="#ffffff" p={5}>
-            <Grid templateColumns="1fr" gap={1}>
-              <Input placeholder="Usuario" onChange={(e) => setEmail(e.target.value)} />
-              
-              <FormControl>
-                <Input 
-                  placeholder="Contraseña" 
-                  type={showPassword ? 'text' : 'password'}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-                <HStack>
-                  <IconButton 
-                    variant="link" 
-                    icon={showPassword ? <ViewOffIcon /> : <ViewIcon />} 
-                    onClick={() => setShowPassword(!showPassword)} 
-                    aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'} 
-                  />
-                  <FormHelperText>{showPassword ? 'Contraseña visible' : 'Contraseña oculta'}</FormHelperText>
-                </HStack>
-              </FormControl>
+          <Heading fontSize="2xl" color={useColorModeValue("blue.800", "blue.300")}>
+            Gestor de Inventario
+          </Heading>
+          <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.400")}>
+            Inicia sesión con tu correo y contraseña
+          </Text>
+        </VStack>
 
-              {error && <Text color="red.500">{error}</Text>} {/* Mensaje de error */}
+        <Box mt={6}>
+          <Grid templateColumns="1fr" gap={4}>
+            <FormControl>
+              <Input
+                placeholder="Correo electrónico"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                borderColor={useColorModeValue("gray.300", "gray.600")}
+                _focus={{ borderColor: "blue.500" }}
+              />
+            </FormControl>
 
-              <HStack w='full' justify='space-between'>
-                <Checkbox>Recordarme.</Checkbox>
-              </HStack>
+            <FormControl>
+              <Input
+                placeholder="Contraseña"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                borderColor={useColorModeValue("gray.300", "gray.600")}
+                _focus={{ borderColor: "blue.500" }}
+              />
+              <IconButton
+                mt={2}
+                variant="ghost"
+                size="sm"
+                icon={showPassword ? <ViewOffIcon /> : <ViewIcon />}
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+              />
+            </FormControl>
 
-              <Button onClick={handleLogin}>Iniciar Sesión</Button>
-            </Grid>
-          </Box>
-        </HStack>
+            {error && (
+              <Text color="red.500" fontSize="sm">
+                {error}
+              </Text>
+            )}
+          </Grid>
+
+          <HStack mt={4} justify="space-between">
+            <Checkbox colorScheme="blue">Recordarme</Checkbox>
+            <Text fontSize="sm" color="blue.500" cursor="pointer">
+              ¿Olvidaste tu contraseña?
+            </Text>
+          </HStack>
+
+          <Button
+            mt={6}
+            colorScheme="blue"
+            width="full"
+            onClick={handleLogin}
+            _hover={{ bg: "blue.600" }}
+          >
+            Iniciar Sesión
+          </Button>
+        </Box>
       </Box>
-    </Box>
+    </Flex>
   );
 }
 

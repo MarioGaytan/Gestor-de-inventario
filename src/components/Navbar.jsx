@@ -7,24 +7,36 @@ import app from '../../firebase-config';
 
 const auth = getAuth(app);
 
+/**
+ * Componente Navbar que muestra una barra de navegación con opciones de búsqueda y control de sesión.
+ * @param {string} userRole - El rol del usuario (por ejemplo, 'gerente' o 'dueno') para mostrar opciones específicas.
+ * @param {function} onSearchChange - Función para manejar cambios en el campo de búsqueda.
+ */
 const Navbar = ({ userRole, onSearchChange }) => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [showSearch, setShowSearch] = useState(false);
+  const [searchTerm, setSearchTerm] = useState(''); // Estado para el término de búsqueda
+  const [showSearch, setShowSearch] = useState(false); // Estado para mostrar u ocultar el campo de búsqueda
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Suscribirse a los cambios en la autenticación del usuario
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (!user) {
-        navigate("/signin");
+        navigate("/signin"); // Navegar a la página de inicio de sesión si no hay un usuario autenticado
       }
     });
+
+    // Limpiar la suscripción cuando el componente se desmonte
     return () => unsubscribe();
   }, [navigate]);
 
+  /**
+   * Maneja el cambio en el campo de búsqueda.
+   * @param {Event} e - Evento de cambio en el campo de búsqueda.
+   */
   const handleSearchChange = (e) => {
     const value = e.target.value;
-    setSearchTerm(value);
-    onSearchChange(value); // Se delega la lógica de filtrado a `App.jsx`
+    setSearchTerm(value); // Actualiza el estado del término de búsqueda
+    onSearchChange(value); // Llama a la función de cambio de búsqueda pasada como prop
   };
 
   return (
@@ -56,7 +68,7 @@ const Navbar = ({ userRole, onSearchChange }) => {
             aria-label="Buscar"
             icon={<SearchIcon />}
             variant={"ghost"}
-            onClick={() => setShowSearch(!showSearch)}
+            onClick={() => setShowSearch(!showSearch)} // Alterna la visibilidad del campo de búsqueda
             color="white"
           />
         </Flex>
@@ -67,7 +79,7 @@ const Navbar = ({ userRole, onSearchChange }) => {
           <Input
             placeholder="Buscar..."
             value={searchTerm}
-            onChange={handleSearchChange}
+            onChange={handleSearchChange} // Llama a la función de manejo de cambio de búsqueda
           />
         </Box>
       )}
