@@ -31,7 +31,7 @@ function Grafics() {
     // Función para obtener datos de ventas y calcular las métricas
     const fetchVentas = async () => {
       try {
-        const response = await fetch('https://api-inventario-n6uo.onrender.com/ventas');
+        const response = await fetch('http://localhost:3000/ventas');
         const result = await response.json();
         if (result.data) {
           const usuariosIds = [...new Set(result.data.map((venta) => venta.idUsuario))];
@@ -40,7 +40,7 @@ function Grafics() {
           // Obtener correos electrónicos de los usuarios
           const usuariosEmails = await Promise.all(
             usuariosIds.map(async (idUsuario) => {
-              const userResponse = await fetch(`https://api-inventario-n6uo.onrender.com/usuarios/${idUsuario}`);
+              const userResponse = await fetch(`http://localhost:3000/usuarios/${idUsuario}`);
               const userResult = await userResponse.json();
               return { idUsuario, email: userResult.correo };
             })
@@ -78,7 +78,7 @@ function Grafics() {
 
           const productosConNombres = await Promise.all(
             Object.values(productosPorVenta).map(async (producto) => {
-              const productResponse = await fetch(`https://api-inventario-n6uo.onrender.com/productos/${producto.idProducto}`);
+              const productResponse = await fetch(`http://localhost:3000/productos/${producto.idProducto}`);
               const productResult = await productResponse.json();
               return { ...producto, nombre: productResult.nombre };
             })
@@ -122,7 +122,7 @@ function Grafics() {
 
     try {
       const response = await fetch(
-        `https://api-inventario-n6uo.onrender.com/ventas?fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`
+        `http://localhost:3000/ventas?fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`
       );
       const result = await response.json();
       if (result.data) {
@@ -131,7 +131,7 @@ function Grafics() {
 
         const usuariosEmails = await Promise.all(
           usuariosIds.map(async (idUsuario) => {
-            const userResponse = await fetch(`https://api-inventario-n6uo.onrender.com/usuarios/${idUsuario}`);
+            const userResponse = await fetch(`http://localhost:3000/usuarios/${idUsuario}`);
             const userResult = await userResponse.json();
             return { idUsuario, email: userResult.correo };
           })

@@ -23,7 +23,7 @@ function Cards({ productos, onDelete, onUpdate, userRole, idUsuario }) {
   const [confirmAction, setConfirmAction] = useState(null); // Manejar confirmaciones
   const [isConfirmOpen, setIsConfirmOpen] = useState(false); // Estado para el modal de confirmación
   const toast = useToast(); // Hook de Chakra UI para notificaciones
-  const apiURL = 'https://api-inventario-n6uo.onrender.com/ventas'; // URL de la API de ventas
+  const apiURL = 'http://localhost:3000/ventas'; // URL de la API de ventas
 
   useEffect(() => {
     if (selectedTodo) {
