@@ -3,7 +3,7 @@ import { Box, Button, Input, FormControl, FormLabel, useToast } from '@chakra-ui
 import { useNavigate } from 'react-router-dom';
 
 /**
- * Componente Home que permite agregar un producto a la API REST.
+ * Componente Home que permite agregar un producto a la API REST. 1
  */
 function Home() {
   const navigate = useNavigate();
@@ -26,12 +26,8 @@ function Home() {
     const newProduct = { id, nombre, descripcion, cantidad };
 
     try {
-<<<<<<< HEAD
-      const response = await fetch('https://api-inventario-n6uo.onrender.com/productos', {
-=======
       // Enviar solicitud POST a la API para agregar el nuevo producto
       const response = await fetch('http://localhost:3000/productos', {
->>>>>>> b5a4859c870652c8772d0b78269a8d231d60eeef
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
