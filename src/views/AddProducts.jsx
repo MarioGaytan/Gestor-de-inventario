@@ -3,7 +3,7 @@ import { Box, Button, Input, FormControl, FormLabel, useToast } from '@chakra-ui
 import { useNavigate } from 'react-router-dom';
 
 /**
- * Componente Home que permite agregar un producto a la API REST.
+ * Componente Home que permite agregar un producto a la API REST. 1
  */
 function Home() {
   const navigate = useNavigate();
