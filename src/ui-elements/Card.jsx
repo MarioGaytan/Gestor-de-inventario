@@ -34,19 +34,19 @@ function Cards({ productos, onDelete, onUpdate, userRole, idUsuario }) {
           const productoActualizado = snapshot.docs
             .map((doc) => ({ id: doc.id, ...doc.data() }))
             .find((producto) => producto.id === selectedTodo.id);
-  
+
           // Actualizar el estado si se encuentra el producto
           if (productoActualizado) {
             setSelectedTodo(productoActualizado);
           }
         }
       );
-  
+
       // Limpia la suscripción cuando el producto seleccionado cambia o se deselecciona
       return () => unsubscribe();
     }
   }, [selectedTodo]);
-  
+
 
   /**
    * Abre el modal y establece el producto seleccionado.
@@ -73,18 +73,18 @@ function Cards({ productos, onDelete, onUpdate, userRole, idUsuario }) {
     setConfirmAction({ type: actionType, callback: actionCallback });
     setIsConfirmOpen(true);
   };
-  
+
   const executeConfirmedAction = () => {
     if (confirmAction?.callback) confirmAction.callback();
     setIsConfirmOpen(false);
   };
-  
+
 
   /**
    * Maneja la eliminación del producto seleccionado.
    */
   const handleDelete = () => {
-    handleConfirm( 'delete', () => {
+    handleConfirm('delete', () => {
       onDelete(selectedTodo.id); // Llama a la función de eliminación
       toast({
         title: 'Producto Eliminado',
@@ -100,11 +100,11 @@ function Cards({ productos, onDelete, onUpdate, userRole, idUsuario }) {
    * Función para manejar la actualización de productos y la creación de ventas.
    */
   const handleUpdateProduct = () => {
-    handleConfirm('update',() => {
+    handleConfirm('update', () => {
       if (!selectedTodo) return;
 
       const newCantidad = selectedTodo.cantidad + cantidadAgregar - cantidadRetirar;
-  
+
       // Asegúrate de que la nueva cantidad no sea negativa
       if (newCantidad < 0) {
         toast({
@@ -115,7 +115,7 @@ function Cards({ productos, onDelete, onUpdate, userRole, idUsuario }) {
           isClosable: true,
         });
         return;
-      }  
+      }
 
       onUpdate(selectedTodo.id, { ...selectedTodo, cantidad: newCantidad });
       toast({
@@ -126,7 +126,7 @@ function Cards({ productos, onDelete, onUpdate, userRole, idUsuario }) {
         isClosable: true,
       });
 
-    // Crear venta automáticamente si se ha retirado una cantidad
+      // Crear venta automáticamente si se ha retirado una cantidad
       if (cantidadRetirar > 0) {
         handleCreateSale(); // Llamar a la función para crear la venta
       }
@@ -212,6 +212,7 @@ function Cards({ productos, onDelete, onUpdate, userRole, idUsuario }) {
                             value={cantidadAgregar}
                             onChange={e => setCantidadAgregar(Math.max(0, parseInt(e.target.value) || 0))}
                             min="0"
+                            max="10000000" // Límite máximo de 10,000,000
                             step="1"
                             placeholder="Cantidad a agregar"
                           />
@@ -264,7 +265,7 @@ function Cards({ productos, onDelete, onUpdate, userRole, idUsuario }) {
               </Text>
             ) : (
               <Text>
-                ¿Estás seguro que deseas actualizar el producto <strong>{selectedTodo?.nombre}</strong> ajustando las cantidades? 
+                ¿Estás seguro que deseas actualizar el producto <strong>{selectedTodo?.nombre}</strong> ajustando las cantidades?
                 Se agregarán <strong>{cantidadAgregar}</strong> y se retirarán <strong>{cantidadRetirar}</strong>.
               </Text>
             )}

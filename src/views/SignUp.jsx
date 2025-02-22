@@ -1,23 +1,38 @@
 import React from "react";
 import app from "../../firebase-config";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-import { getFirestore, doc, collection, setDoc } from "firebase/firestore";
+import { getFirestore, doc, setDoc } from "firebase/firestore";
 
 const auth = getAuth(app);
 
-
+/**
+ * Componente SignUp que maneja el registro de nuevos usuarios.
+ */
 function SignUp() {
     const firestore = getFirestore(app);
+
+    /**
+     * Función asincrónica para registrar un nuevo usuario en Firebase Authentication y Firestore.
+     * @param {string} email - Correo electrónico del usuario.
+     * @param {string} password - Contraseña del usuario.
+     * @param {string} rol - Rol asignado al usuario (dueno, trabajador, gerente).
+     */
     async function registrarUsuario(email, password, rol) {
         const infoUsuario = await createUserWithEmailAndPassword(auth, email, password)
             .then((usuarioFirebase) => {
                 return usuarioFirebase;
             });
+
         console.log(infoUsuario.user.uid);
+
         const docuRef = doc(firestore, `Usuarios/${infoUsuario.user.uid}`);
         setDoc(docuRef, { correo: email, rol: rol });
     }
 
+    /**
+     * Manejador del evento de envío del formulario.
+     * @param {Event} e - Evento de envío del formulario.
+     */
     function submitHandler(e) {
         e.preventDefault();
 
