@@ -22,7 +22,7 @@ function Home() {
     const newProduct = { id, nombre, descripcion, cantidad };
 
     try {
-      const response = await fetch('http://localhost:3000/productos', {
+      const response = await fetch('https://api-inventario-n6uo.onrender.com/productos', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
