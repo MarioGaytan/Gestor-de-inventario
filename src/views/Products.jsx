@@ -5,7 +5,7 @@ import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase-config'
 
 const Products = ({ userRole, idUsuario, searchTerm }) => {
-  const url = 'http://localhost:3000/productos';
+  const url = 'https://api-inventario-n6uo.onrender.com/productos';
   const [todos, setTodos] = useState([]);
   const [filteredTodos, setFilteredTodos] = useState([]);
   const [error, setError] = useState(null);
